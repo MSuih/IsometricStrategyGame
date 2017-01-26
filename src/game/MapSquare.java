@@ -16,7 +16,7 @@ public class MapSquare {
     private byte data;
 
     public MapSquare() {
-        this(false, false, (byte) 0);
+        this(false, false, 0);
     }
 
     public MapSquare(boolean wallAtTop, boolean wallAtLeft, int height) {
