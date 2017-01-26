@@ -1,49 +1,54 @@
 package game;
 
 public class MapSquare {
-    private boolean wallAtTop;
-    private boolean wallAtLeft;
-    private byte height;
+    /*
+    To avoid overhead, we'll be using bit-level stuff
+    0000 0000
+    first two bits are top & left wall
+    1100 0000
+    last 6 bits are wall height
+    0011 1111
+    */
+    private static final byte wallTopBit = (byte) 0b10000000;
+    private static final byte wallLeftBit = 0b01000000;
+    private static final byte wallHeightMask = 0b00111111;
+
+    private byte data;
 
     public MapSquare() {
         this(false, false, (byte) 0);
     }
 
-    public MapSquare(boolean wallAtTop, boolean wallAtLeft, byte height) {
-        this.wallAtTop = wallAtTop;
-        this.wallAtLeft = wallAtLeft;
-        this.height = height;
+    public MapSquare(boolean wallAtTop, boolean wallAtLeft, int height) {
+        data = 0;
+        if (wallAtTop) data = (byte) (data ^ wallTopBit);
+        if (wallAtLeft) data = (byte) (data ^ wallLeftBit);
+        height = height & wallHeightMask;
+        data = (byte) (data ^ height);
     }
 
     public boolean isWallAtTop() {
-        return wallAtTop;
+        return (data & wallTopBit) == wallTopBit;
     }
 
     public boolean isWallAtLeft() {
-        return wallAtLeft;
+        return (data & wallLeftBit) == wallLeftBit;
     }
 
-    public byte getHeight() {
-        return height;
+    public int getHeight() {
+        return data & wallHeightMask;
     }
 
     public void toggleWallAtTop() {
-        wallAtLeft = !wallAtLeft;
-    }
-
-    public void setWallAtTop(boolean wallAtTop) {
-        this.wallAtTop = wallAtTop;
+        data = (byte) (data ^ wallTopBit);
     }
 
     public void toggleWallAtLeft() {
-        wallAtLeft = !wallAtLeft;
+        data = (byte) (data ^ wallLeftBit);
     }
 
-    public void setWallAtLeft(boolean wallAtLeft) {
-        this.wallAtLeft = wallAtLeft;
-    }
-
-    public void setHeight(byte height) {
-        this.height = height;
+    public void setHeight(int height) {
+        height = height & wallHeightMask;
+        data = (byte) (data & height);
     }
 }

@@ -25,7 +25,7 @@ public class GameWindow extends JFrame {
                 BufferCapabilities.FlipContents.BACKGROUND);
         /*TODO: bufferStrategy should be created from AWT EDT via invokeLater()
          * maybe figure out how and where to do this
-        SwingUtilities.invokeLater(() -> strategy = createAndReturnBufferStrategy(bufCap));*/
+        createAndReturnBufferStrategy(bufCap); -> wait -> notify -> ??*/
         BufferStrategy strategy = createAndReturnBufferStrategy(bufCap);
 
         long timeLast = System.nanoTime();
@@ -85,52 +85,7 @@ public class GameWindow extends JFrame {
         double centerX = startX + sideX / 2d;
         double centerY = startY + sideY / 2d;
 
-        int[][] arr  = new int[][] {
-            {0, 1, 2, 3},
-            {3, 2, 1, 0},
-            {0, 0, 1, 1},
-            {2, 2, 3, 3}
-        };
-
-        final int tilesize = 100;
-        final int halftile = tilesize / 2;
         AffineTransform defaultAff = g2d.getTransform();
-        Shape tile = new Path2D.Double() {
-            {
-                moveTo(halftile, 0);
-                lineTo(tilesize, halftile);
-                lineTo(halftile, tilesize);
-                lineTo(0, halftile);
-                lineTo(halftile, 0);
-            }
-        };
-        //sh = new Rectangle2D.Double(0, 0, 50, 50);
-        /*for (int y = 0; y < arr.length; y++) {
-            for (int x = 0; x < arr[y].length; x++) {
-                switch(arr[x][y]) {
-                    case 0:
-                        g2d.setColor(Color.green);
-                        break;
-                    case 1:
-                        g2d.setColor(Color.red);
-                        break;
-                    case 2:
-                        g2d.setColor(Color.BLUE);
-                        break;
-                    case 3:
-                        g2d.setColor(Color.PINK);
-                        break;
-                }
-                AffineTransform aff = (AffineTransform) defaultAff.clone();
-                aff.translate(centerX, centerY);
-                aff.translate(
-                        (x-y) * halftile,
-                        (x+y) * halftile/2d);
-                aff.scale(1, 0.5);
-                g2d.setTransform(aff);
-                g2d.draw(tile);
-            }
-        }*/
 
         g2d.setTransform(defaultAff);
         drawSquares(g2d, startX, startY);
@@ -153,10 +108,9 @@ public class GameWindow extends JFrame {
             AffineTransform aff = (AffineTransform) defaultAff.clone();
             aff.translate(startX - halftile, startY - halftile);
             aff.scale(1, 0.5);
-            aff.translate(0, halftile * y);
+            //set initial x square to -1 because we increase it next
+            aff.translate(-tilesize, halftile * y);
             if (y % 2 == 0) aff.translate(0, halftile);
-            //set initial square to -1 because we increase it next
-            aff.translate(-tilesize, 0);
             for (int x = 0; x < 6; x++) {
                 aff.translate(tilesize, 0);
                 g2d.setTransform(aff);
