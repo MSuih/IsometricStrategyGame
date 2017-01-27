@@ -14,6 +14,6 @@ public class IsometricUtilities {
         throw new UnsupportedOperationException("Todo");
     }
     public static Point coord2iso(Point p) {
-        return iso2coord(p.x, p.y);
+        return coord2iso(p.x, p.y);
     }
 }
