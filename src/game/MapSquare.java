@@ -12,6 +12,7 @@ public class MapSquare {
     private static final byte wallTopBit = (byte) 0b10000000;
     private static final byte wallLeftBit = 0b01000000;
     private static final byte wallHeightMask = 0b00111111;
+    //TODO: More data? 
 
     private byte data;
 

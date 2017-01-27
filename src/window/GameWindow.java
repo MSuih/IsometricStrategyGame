@@ -60,18 +60,18 @@ public class GameWindow extends JFrame {
         try {
             this.createBufferStrategy(2, bufCap);
         } catch (AWTException ex) {
-            System.out.println("Could not create accelerated buffers!");
+            System.err.println("Could not create accelerated buffers!");
             try {
                 bufCap = new BufferCapabilities(
                     new ImageCapabilities(false),
                     new ImageCapabilities(false),
                     BufferCapabilities.FlipContents.BACKGROUND);
                 this.createBufferStrategy(2, bufCap);
-                System.out.println("Created unaccelerated buffers instead");
+                System.err.println("Created unaccelerated buffers instead");
             } catch (AWTException ex1) {
                 this.createBufferStrategy(2);
-                System.out.println("Could not create unaccelerated buffers either");
-                System.out.println("Falling back to non-specific buffer, page flipping will not work properly");
+                System.err.println("Could not create unaccelerated buffers either");
+                System.err.println("Falling back to non-specific buffer, page flipping will not work properly");
             }
         }
         return this.getBufferStrategy();
@@ -88,11 +88,13 @@ public class GameWindow extends JFrame {
         AffineTransform defaultAff = g2d.getTransform();
 
         g2d.setTransform(defaultAff);
-        drawSquares(g2d, startX, startY);
+        drawSquares(g2d, startX, startY, sideX, sideY);
     }
-    private void drawSquares(Graphics2D g2d, double startX, double startY) {
+    private void drawSquares(Graphics2D g2d, double startX, double startY, double width, double height) {
         final int tilesize = 100;
         final int halftile = tilesize / 2;
+        double tilesX = width / tilesize + 1;
+        double tilesY = height / halftile * 2;
         AffineTransform defaultAff = g2d.getTransform();
         Shape tile = new Path2D.Double() {
             {
@@ -104,14 +106,16 @@ public class GameWindow extends JFrame {
             }
         };
         g2d.setColor(Color.GREEN);
-        for (int y = 0; y < 20; y++) {
+        for (int y = 0; y < tilesY; y++) {
             AffineTransform aff = (AffineTransform) defaultAff.clone();
-            aff.translate(startX - halftile, startY - halftile);
+            aff.translate(startX, startY);
             aff.scale(1, 0.5);
+            //start at center of tile
+            aff.translate(-halftile, -halftile);
             //set initial x square to -1 because we increase it next
             aff.translate(-tilesize, halftile * y);
             if (y % 2 == 0) aff.translate(0, halftile);
-            for (int x = 0; x < 6; x++) {
+            for (int x = 0; x < tilesX; x++) {
                 aff.translate(tilesize, 0);
                 g2d.setTransform(aff);
                 g2d.draw(tile);
