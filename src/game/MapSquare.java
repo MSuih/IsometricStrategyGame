@@ -12,7 +12,10 @@ public class MapSquare {
     private static final byte wallTopBit = (byte) 0b10000000;
     private static final byte wallLeftBit = 0b01000000;
     private static final byte wallHeightMask = 0b00111111;
-    //TODO: More data? 
+    //TODO: More data? Wall height doesn't need 6 bits, 4 is enough.
+    //one or two bits could be used to check if this vector stops movement and/or projectiles
+    //also each square could include a prop (=String or null)
+    //prop could be another class
 
     private byte data;
 
