@@ -6,18 +6,20 @@ public class MapSquare {
     0000 0000
     first two bits are top & left wall
     1100 0000
-    second two bits tell if the square is walkable and/or obaque
+    second two bits tell the type of this square
     0011 0000
-    last 4 bits are wall height
+    last 4 bits are square height
     0000 1111
     */
     private static final byte wallTopBit = (byte) 0b10000000;
     private static final byte wallLeftBit = 0b01000000;
-    //TODO: Are there more states than walkable & solid? We could store 4 different states here
-    private static final byte wallTypeMask = 0b00110000;
-    private static final byte isWalkableBit = 0b00100000;
-    private static final byte isSolidBit = 0b00010000;
-    private static final byte wallHeightMask = 0b00001111;
+    private static final byte squareTypeMask = 0b00110000;
+    private static final byte typeWalkable = 0b00000000;
+    private static final byte typeViewable = 0b00010000;
+    //Reserved for future use
+    //private static final byte typeExtra = 0b00100000;
+    private static final byte typeSolid = 0b00110000;
+    private static final byte heightMask = 0b00001111;
 
     private byte data;
 
@@ -28,16 +30,21 @@ public class MapSquare {
     public MapSquare(boolean wallAtTop, boolean wallAtLeft, int height) {
         this(wallAtTop, wallAtLeft, height, SquareType.WALKABLE);
     }
+
     public MapSquare(boolean wallAtTop, boolean wallAtLeft, int height, SquareType type) {
         data = 0;
 
         if (wallAtTop) data = (byte) (data ^ wallTopBit);
         if (wallAtLeft) data = (byte) (data ^ wallLeftBit);
 
-        height = height & wallHeightMask;
+        height = height & heightMask;
         data = (byte) (data ^ height);
 
         data = (byte) (data ^ type.getAsBits());
+    }
+
+    public MapSquare(byte data) {
+        this.data = data;
     }
 
     public boolean isWallAtTop() {
@@ -49,7 +56,7 @@ public class MapSquare {
     }
 
     public int getHeight() {
-        return data & wallHeightMask;
+        return data & heightMask;
     }
 
     public void toggleWallAtTop() {
@@ -61,7 +68,7 @@ public class MapSquare {
     }
 
     public void setHeight(int height) {
-        height = height & wallHeightMask;
+        height = height & heightMask;
         data = (byte) (data & height);
     }
 
@@ -74,26 +81,30 @@ public class MapSquare {
     }
 
     public static enum SquareType {
-        WALKABLE, SOLID; //space for two more
+        WALKABLE, VIEWABLE, SOLID; //space for one more
 
         public byte getAsBits() {
             switch (this) {
                 case WALKABLE:
-                    return isWalkableBit;
+                    return typeWalkable;
                 case SOLID:
-                    return isSolidBit;
+                    return typeSolid;
+                case VIEWABLE:
+                    return typeViewable;
                 default:
                     throw new AssertionError("SquareType does not have a mask");
             }
         }
-        
+
         public static SquareType bitsToType(byte bits) {
-            bits = (byte) (bits & wallTypeMask);
+            bits = (byte) (bits & squareTypeMask);
             switch (bits) {
-                case isWalkableBit:
+                case typeWalkable:
                     return WALKABLE;
-                case isSolidBit:
+                case typeSolid:
                     return SOLID;
+                case typeViewable:
+                    return VIEWABLE;
                 default:
                     throw new AssertionError("No squaretype for these bits: " + Integer.toBinaryString(bits));
             }

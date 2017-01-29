@@ -5,13 +5,17 @@ public class IsometricUtilities {
     private IsometricUtilities() {}
 
     public static Point iso2coord(int x, int y) {
-        throw new UnsupportedOperationException("Todo");
+        final int px = (2 * y + x) /2;
+        final int py = (2 * y - x) / 2;
+        return new Point(px, py);
     }
     public static Point iso2coord(Point p) {
         return iso2coord(p.x, p.y);
     }
     public static Point coord2iso(int x, int y) {
-        throw new UnsupportedOperationException("Todo");
+        final int px = x - y;
+        final int py = x + y;
+        return new Point(px, py);
     }
     public static Point coord2iso(Point p) {
         return coord2iso(p.x, p.y);

@@ -4,6 +4,7 @@ import game.Game;
 import java.awt.AWTException;
 import java.awt.BufferCapabilities;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.ImageCapabilities;
 import java.awt.Insets;
@@ -35,6 +36,7 @@ public class GameWindow extends JFrame {
             do {
                 do {
                     Graphics2D g2d = (Graphics2D) strategy.getDrawGraphics();
+                    g2d.setFont(new Font(Font.MONOSPACED, Font.BOLD, 18));
                     drawWindow(g2d);
 
                     //DEBUG
@@ -124,7 +126,6 @@ public class GameWindow extends JFrame {
                 lineTo(halftile, 0);
             }
         };
-        g2d.setColor(Color.GREEN);
         for (int y = 0; y < tilesY; y++) {
             AffineTransform aff = (AffineTransform) defaultAff.clone();
             aff.translate(startX, startY);
@@ -136,12 +137,15 @@ public class GameWindow extends JFrame {
             if (y % 2 == 0) aff.translate(halftile, 0);
             for (int x = 0; x < tilesX; x++) {
                 aff.translate(tilesize, 0);
-                //TODO: Convert isometric squares to game coordinates
-                //and remember to use camera & tileOffset x/y variables
+                //TODO: use camera & tileOffset x/y variables
                 Point p = IsometricUtilities.iso2coord(x, y);
                 if (game.squareExists(p.x, p.y)) {
                     g2d.setTransform(aff);
+                    g2d.setColor(Color.GREEN);
                     g2d.draw(tile);
+                    g2d.drawString(x + "," + y, 35, 50);
+                    g2d.setColor(Color.YELLOW);
+                    g2d.drawString(p.x + "," + p.y, 35, 70);
                 }
             }
         }

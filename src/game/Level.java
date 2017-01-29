@@ -14,7 +14,10 @@ public class Level {
         );
     }
 
-    boolean insideBounds(int x, int y) {
+    public boolean insideBounds(int x, int y) {
         return (x < squares.size()? y < squares.get(x).size(): false);
+    }
+    public MapSquare.SquareType getType(int x, int y) {
+        return squares.get(x).get(y).getType();
     }
 }
