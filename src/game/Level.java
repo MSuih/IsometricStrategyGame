@@ -8,9 +8,9 @@ import java.util.stream.Stream;
 public class Level {
     List<List<MapSquare>> squares = new ArrayList<>();
     public Level() {
-        squares.addAll(Stream.generate(ArrayList<MapSquare>::new).limit(30).collect(Collectors.toList()));
+        squares.addAll(Stream.generate(ArrayList<MapSquare>::new).limit(15).collect(Collectors.toList()));
         squares.forEach((l) ->
-            l.addAll(Stream.generate(MapSquare::new).limit(30).collect(Collectors.toList()))
+            l.addAll(Stream.generate(MapSquare::new).limit(15).collect(Collectors.toList()))
         );
     }
 

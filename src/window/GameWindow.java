@@ -58,6 +58,7 @@ public class GameWindow extends JFrame {
     }
     //"andReturn" added to avoid name conflicts with JFrame.createBufferStrategy()
     private BufferStrategy createAndReturnBufferStrategy() {
+        final int buffers = 2;
         try {
             //API docs say BufferStrategy should only be created within AWT EDT.
             //So that's what we're going to do. InvokeAndWait executes in EDT.
@@ -67,7 +68,7 @@ public class GameWindow extends JFrame {
                             new ImageCapabilities(true),
                             new ImageCapabilities(true),
                             BufferCapabilities.FlipContents.BACKGROUND);
-                    this.createBufferStrategy(2, bufCap);
+                    this.createBufferStrategy(buffers, bufCap);
                 } catch (AWTException ex) {
                     System.err.println("Could not create accelerated buffers!");
                     try {
@@ -75,12 +76,12 @@ public class GameWindow extends JFrame {
                                 new ImageCapabilities(false),
                                 new ImageCapabilities(false),
                                 BufferCapabilities.FlipContents.BACKGROUND);
-                        this.createBufferStrategy(2, noAcceleration);
+                        this.createBufferStrategy(buffers, noAcceleration);
                         System.err.println("Created unaccelerated buffers instead");
                     } catch (AWTException ex1) {
                         System.err.println("Could not create unaccelerated buffers either");
                         System.err.println("Falling back to non-specific buffer, page flipping will not work properly");
-                        this.createBufferStrategy(2);
+                        this.createBufferStrategy(buffers);
                     }
                 }
 
@@ -126,6 +127,10 @@ public class GameWindow extends JFrame {
                 lineTo(halftile, 0);
             }
         };
+        int x1 = 0, y1 = 0;
+        //TODO: init default values based on camera location
+        boolean b = false;
+        g2d.setColor(Color.GREEN);
         for (int y = 0; y < tilesY; y++) {
             AffineTransform aff = (AffineTransform) defaultAff.clone();
             aff.translate(startX, startY);
@@ -134,20 +139,25 @@ public class GameWindow extends JFrame {
             aff.translate(-halftile, -halftile);
             //set initial x square to -1 because we increase it next
             aff.translate(-tilesize, halftile * y);
-            if (y % 2 == 0) aff.translate(halftile, 0);
+            if (y % 2 != 0) aff.translate(halftile, 0);
+            int x2 = x1, y2 = y1;
             for (int x = 0; x < tilesX; x++) {
                 aff.translate(tilesize, 0);
                 //TODO: use camera & tileOffset x/y variables
-                Point p = IsometricUtilities.iso2coord(x, y);
-                if (game.squareExists(p.x, p.y)) {
+                if (game.squareExists(x2, y2)) {
                     g2d.setTransform(aff);
                     g2d.setColor(Color.GREEN);
                     g2d.draw(tile);
                     g2d.drawString(x + "," + y, 35, 50);
                     g2d.setColor(Color.YELLOW);
-                    g2d.drawString(p.x + "," + p.y, 35, 70);
+                    g2d.drawString(x2 + "," + y2, 35, 70);
                 }
+                x2 --;
+                y2 ++;
             }
+            if (b) x1++;
+            else y1++;
+            b = !b;
         }
         g2d.setTransform(defaultAff);
         g2d.setColor(Color.red);
