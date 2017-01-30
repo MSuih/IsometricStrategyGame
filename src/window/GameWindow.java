@@ -9,6 +9,10 @@ import java.awt.Graphics2D;
 import java.awt.ImageCapabilities;
 import java.awt.Insets;
 import java.awt.Shape;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferStrategy;
@@ -18,10 +22,11 @@ import javax.swing.SwingUtilities;
 
 public class GameWindow extends JFrame {
     private Game game = new Game();
-    private double cameraX = 5, cameraY = 5;
+    private int cameraX = 5, cameraY = 5;
 
     private GameWindow() {
-
+        this.addKeyListener(new CustomKeyListener(KeyBindings.getDefaultBinds()));
+        this.addMouseListener(new CustomMouseListener());
     }
 
     @SuppressWarnings("SleepWhileInLoop")
@@ -80,11 +85,11 @@ public class GameWindow extends JFrame {
                         System.err.println("Created unaccelerated buffers instead");
                     } catch (AWTException ex1) {
                         System.err.println("Could not create unaccelerated buffers either");
-                        System.err.println("Falling back to non-specific buffer, page flipping will not work properly");
+                        System.err.println("Falling back to non-specific buffer, "
+                                + "page flipping will not work properly");
                         this.createBufferStrategy(buffers);
                     }
                 }
-
             });
         } catch (InterruptedException | InvocationTargetException ex) {
             //Something interrupted our invokeAndWait or created an exception that wasnt caught
@@ -127,7 +132,11 @@ public class GameWindow extends JFrame {
                 lineTo(halftile, 0);
             }
         };
+        //x1 & y1 = top-leftmost square
         int x1 = 0, y1 = 0;
+        Point p = IsometricUtilities.coord2iso(cameraX, cameraY);
+        x1 = p.x;
+        y1 = p.y;
         //TODO: init default values based on camera location
         boolean b = false;
         g2d.setColor(Color.GREEN);
@@ -161,11 +170,15 @@ public class GameWindow extends JFrame {
         }
         g2d.setTransform(defaultAff);
         g2d.setColor(Color.red);
-        g2d.drawString(tileOffsetX + " " + tileOffsetY, 100, 100);
+        g2d.drawString(cameraX + " " + cameraY, 100, 100);
     }
 
     private void inputLoop() {
 
+    }
+    private void setCameraLocation(int x, int y) {
+        cameraX = x;
+        cameraY = y;
     }
 
     public static void launchNewWindow(int sizeX, int sizeY) {
@@ -185,5 +198,42 @@ public class GameWindow extends JFrame {
         drawThread.setPriority(Thread.MAX_PRIORITY);
         drawThread.start();
         moveThread.start();
+    }
+
+    private class CustomKeyListener extends KeyAdapter {
+        private final KeyBindings binds;
+        public CustomKeyListener(KeyBindings bindings) {
+            binds = bindings;
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            switch (binds.getActionFor(e.getKeyCode())) {
+                case CAMERA_UP:
+                    cameraX--;
+                    break;
+                case CAMERA_DOWN:
+                    cameraX++;
+                    break;
+                case CAMERA_LEFT:
+                    cameraY--;
+                    break;
+                case CAMERA_RIGHT:
+                    cameraY++;
+                    break;
+            }
+        }
+    }
+    private class CustomMouseListener extends MouseAdapter {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            int x = e.getX();
+            int y = e.getY();
+
+            //Todo: convert to tiles & remove insets
+
+            Point p = IsometricUtilities.coord2iso(x, y);
+            setCameraLocation(p.x, p.y);
+        }
     }
 }
