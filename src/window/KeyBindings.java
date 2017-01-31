@@ -6,12 +6,21 @@ import java.util.Map;
 
 public class KeyBindings {
     public static enum KeyAction {
+        //Returned on keys that are unbound
+        NO_ACTION,
+        //Camera movement
         CAMERA_UP, CAMERA_DOWN, CAMERA_LEFT, CAMERA_RIGHT;
     }
 
-    private final Map<Integer, KeyAction> binds = new HashMap<>();
+    private final Map<Integer, KeyAction> binds;
 
-    public KeyBindings() {}
+    public KeyBindings() {
+        this.binds = new HashMap<>();
+    }
+
+    public KeyBindings(Map<Integer, KeyAction> bindings) {
+        binds = bindings;
+    }
 
     static KeyBindings getDefaultBinds() {
         KeyBindings kb = new KeyBindings();
@@ -22,7 +31,8 @@ public class KeyBindings {
         return kb;
     }
     public void setBinding(int keycode, KeyAction action) {
-        binds.put(keycode, action);
+        if (action == null || action == KeyAction.NO_ACTION) unbind(keycode);
+        else binds.put(keycode, action);
     }
 
     public void unbind(int keycode) {
@@ -30,6 +40,6 @@ public class KeyBindings {
     }
 
     public KeyAction getActionFor(int keycode) {
-        return binds.get(keycode);
+        return binds.getOrDefault(keycode, KeyAction.NO_ACTION);
     }
 }

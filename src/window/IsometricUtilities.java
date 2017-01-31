@@ -5,8 +5,9 @@ public class IsometricUtilities {
     private IsometricUtilities() {}
 
     public static Point iso2coord(int x, int y) {
-        final int px = ( y + x) ;
-        final int py = (  y - x) ;
+        //TODO: needs testing
+        final int px = (y + x);
+        final int py = (y - x) / 2;
         return new Point(px, py);
     }
     public static Point iso2coord(Point p) {

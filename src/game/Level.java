@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 public class Level {
     List<List<MapSquare>> squares = new ArrayList<>();
+    
     public Level() {
         squares.addAll(Stream.generate(ArrayList<MapSquare>::new).limit(15).collect(Collectors.toList()));
         squares.forEach((l) ->

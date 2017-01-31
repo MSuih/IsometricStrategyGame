@@ -19,6 +19,7 @@ import java.awt.image.BufferStrategy;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import window.KeyBindings.KeyAction;
 
 public class GameWindow extends JFrame {
     private Game game = new Game();
@@ -114,9 +115,11 @@ public class GameWindow extends JFrame {
         drawSquares(g2d, startX, startY, sideX, sideY);
         g2d.fillRect((int) centerX - 10, (int) centerY - 10, 10, 10);
     }
+
+    final int tilesize = 100;
+    final int halftile = tilesize / 2;
+
     private void drawSquares(Graphics2D g2d, double startX, double startY, double width, double height) {
-        final int tilesize = 100;
-        final int halftile = tilesize / 2;
         double tilesX = width / tilesize + 1;
         double tilesY = height / halftile * 2 + 0;
         int tileOffsetX = (int) (width / 2 - cameraX) / halftile;
@@ -208,7 +211,8 @@ public class GameWindow extends JFrame {
 
         @Override
         public void keyPressed(KeyEvent e) {
-            switch (binds.getActionFor(e.getKeyCode())) {
+            KeyAction ka = binds.getActionFor(e.getKeyCode());
+            switch (ka) {
                 case CAMERA_UP:
                     cameraX--;
                     break;
@@ -224,16 +228,22 @@ public class GameWindow extends JFrame {
             }
         }
     }
+    
     private class CustomMouseListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
-            int x = e.getX();
-            int y = e.getY();
+            Insets i = getInsets();
+            int x = e.getX() - i.left - i.bottom;
+            int y = e.getY() - i.top - i.right;
 
-            //Todo: convert to tiles & remove insets
-
-            Point p = IsometricUtilities.coord2iso(x, y);
-            setCameraLocation(p.x, p.y);
+            if (x < 0 || y < 0 || x > getWidth() || y > getHeight()) return;
+            x /= halftile;
+            y /= tilesize;
+            Point p = IsometricUtilities.iso2coord(x, y);
+            x = p.x - cameraX;
+            y = p.y - cameraY;
+            System.out.println(x + " " + y);
+            setCameraLocation(x, y);
         }
     }
 }

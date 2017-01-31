@@ -16,9 +16,9 @@ public class MapSquare {
     private static final byte squareTypeMask = 0b00110000;
     private static final byte typeWalkable = 0b00000000;
     private static final byte typeViewable = 0b00010000;
+    private static final byte typeSolid = 0b00110000;
     //Reserved for future use
     //private static final byte typeExtra = 0b00100000;
-    private static final byte typeSolid = 0b00110000;
     private static final byte heightMask = 0b00001111;
 
     private byte data;
