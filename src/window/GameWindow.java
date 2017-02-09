@@ -19,7 +19,6 @@ import java.awt.image.BufferStrategy;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import window.KeyBindings.KeyAction;
 
 public class GameWindow extends JFrame {
     private Game game = new Game();
@@ -135,11 +134,10 @@ public class GameWindow extends JFrame {
                 lineTo(halftile, 0);
             }
         };
+        Point p = IsometricUtilities.coord2screen(cameraX, cameraY);
         //x1 & y1 = top-leftmost square
-        int x1 = 0, y1 = 0;
-        Point p = IsometricUtilities.coord2iso(cameraX, cameraY);
-        x1 = p.x;
-        y1 = p.y;
+        int x1 = p.x;
+        int y1 = p.y;
         //TODO: init default values based on camera location
         boolean b = false;
         g2d.setColor(Color.GREEN);
@@ -211,8 +209,7 @@ public class GameWindow extends JFrame {
 
         @Override
         public void keyPressed(KeyEvent e) {
-            KeyAction ka = binds.getActionFor(e.getKeyCode());
-            switch (ka) {
+            switch (binds.getActionFor(e.getKeyCode())) {
                 case CAMERA_UP:
                     cameraX--;
                     break;
@@ -228,22 +225,24 @@ public class GameWindow extends JFrame {
             }
         }
     }
-    
+
     private class CustomMouseListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
             Insets i = getInsets();
-            int x = e.getX() - i.left - i.bottom;
-            int y = e.getY() - i.top - i.right;
+            int x = e.getX() - i.left;
+            int y = e.getY() - i.top;
+            int height = getHeight() - i.bottom;
+            int width = getWidth() - i.right;
 
-            if (x < 0 || y < 0 || x > getWidth() || y > getHeight()) return;
-            x /= halftile;
-            y /= tilesize;
-            Point p = IsometricUtilities.iso2coord(x, y);
-            x = p.x - cameraX;
-            y = p.y - cameraY;
-            System.out.println(x + " " + y);
-            setCameraLocation(x, y);
+            if (x < 0 || y < 0 || x > width || y > height) return;
+            x /= tilesize;
+            y /= halftile;
+            Point p = IsometricUtilities.screen2coord(x, y);
+            x = cameraX - p.x;
+            y = cameraY - p.y;
+            System.out.println(x + " " + y + ", " + p.x + " " + p.y);
+            //setCameraLocation(x, y);
         }
     }
 }
